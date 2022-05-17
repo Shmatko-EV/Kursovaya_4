@@ -3,7 +3,9 @@ from flask_cors import CORS
 from flask_restx import Api
 
 from project.setup_db import db
-from project.views import genres_ns
+from project.views.directors import director_ns
+from project.views.genres import genre_ns
+from project.views.movies import movie_ns
 
 api = Api(
     authorizations={
@@ -13,11 +15,12 @@ api = Api(
     doc="/docs",
 )
 
-# Нужно для работы с фронтендом
+# Нужно для работы с фронтендом.
 cors = CORS()
 
 
 def create_app(config_obj):
+    """ Создает приложение: данные таблиц БД и регистрация эндпоинтов. """
     app = Flask(__name__)
     app.config.from_object(config_obj)
 
@@ -26,6 +29,8 @@ def create_app(config_obj):
     api.init_app(app)
 
     # Регистрация эндпоинтов
-    # api.add_namespace(genres_ns)
+    api.add_namespace(genre_ns)
+    api.add_namespace(movie_ns)
+    api.add_namespace(director_ns)
 
     return app

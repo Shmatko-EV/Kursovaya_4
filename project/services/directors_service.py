@@ -1,20 +1,20 @@
-from project.dao import GenreDAO
+from project.dao.director import DirectorDAO
 from project.exceptions import ItemNotFound
-from project.schemas.genre import GenreSchema
+from project.schemas.director import DirectorSchema
 from project.services.base import BaseService
 
 
-class GenresService(BaseService):
+class DirectorsService(BaseService):
     def get_item_by_id(self, pk):
         """ Возвращает данные одной строки из таблицы с помощью DAO и сериализации (схемы)."""
 
-        genre = GenreDAO(self._db_session).get_by_id(pk)
-        if not genre:
+        director = DirectorDAO(self._db_session).get_by_id(pk)
+        if not director:
             raise ItemNotFound
-        return GenreSchema().dump(genre)
+        return DirectorSchema().dump(director)
 
-    def get_all_genres(self):
+    def get_all_directors(self):
         """ Возвращает все данные из таблицы с помощью DAO и сериализации (схемы)."""
 
-        genres = GenreDAO(self._db_session).get_all()
-        return GenreSchema(many=True).dump(genres)
+        directors = DirectorDAO(self._db_session).get_all()
+        return DirectorSchema(many=True).dump(directors)

@@ -1,5 +1,5 @@
-from .genres import genres_ns
+from .genres import genre_ns
 
 __all__ = [
-    "genres_ns",
+    "genre_ns",
 ]
