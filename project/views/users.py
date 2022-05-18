@@ -10,6 +10,7 @@ user_ns = Namespace('users')
 
 @user_ns.route('/')
 class UsersView(Resource):
+    @auth_required
     def get(self):
         """ Возвращает данные обо всех пользователях. """
 
@@ -29,7 +30,7 @@ class UserView(Resource):
         return sm_u, 200
 
     @auth_required
-    def put(self, uid):
+    def patch(self, uid):
         """ Обновляет данные пользователя."""
 
         # Получаем из запроса данные в виде JSON формата.
@@ -51,15 +52,14 @@ class PasswordView(Resource):
         # Получаем из запроса данные о паролях в формате json.
         passwords = request.json
         # Если данных нет хотя бы в одном из полей, то возвращаем ошибку.
-        if passwords.get('old_password') or passwords.get('new_password') is None:
+        if passwords.get('old_password') is None or passwords.get('new_password') is None:
             return abort(403)
 
         # Получаем токен пользователя из параметра запроса авторизации.
         user_data = request.headers['Authorization']
         token = user_data.split(' ')[-1]
 
-        user = user_service.update_user_password(token, passwords)
-        new_tokens = auth_service.login(user)
+        # Обновляем пароль пользователя.
+        user_service.update_user_password(token, passwords)
 
-        return new_tokens, 204
-
+        return "", 204

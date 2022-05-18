@@ -1,7 +1,7 @@
 from project.config import DevelopmentConfig
-from project.dao.models import Genre
-from project.server import create_app, db
+from project.server import create_app
 
+# Создание приложения с помощью функции, находящейся в сервере.
 app = create_app(DevelopmentConfig)
 
 

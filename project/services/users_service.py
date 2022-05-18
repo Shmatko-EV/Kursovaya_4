@@ -47,11 +47,9 @@ class UsersService(BaseService):
             abort(401, message='User not found')
 
         # Проверка пароля пользователя.
-        # КОГДА ЕСТЬ ЭТА ПРОВЕРКА У МЕНЯ ПОЧЕМУ-ТО ВЫВОДИТ ОШИБКУ, КОГДА ВВОЖУ ДАННЫЕ ПОЛЬЗОВАТЕЛЯ (email и password),
-        # ХОТЯ В ЗАПРОСЕ auth/login ВВОЖУ ТЕ ЖЕ ДАННЫЕ ЧТО И ПРИ РЕГИСТРАЦИИ (auth/register)
-        # hashed_password = get_hashed_password(data['password'])
-        # if hashed_password != user_data['password']:
-        #     abort(401, message='Invalid password')
+        hashed_password = get_hashed_password(data['password'])
+        if hashed_password != user_data.password:
+            abort(401, message='Invalid password')
 
         # Если пользователь в БД найден, то генерируем и выдаем ему токены в виде JSON.
         tokens = generate_tokens(
@@ -85,16 +83,19 @@ class UsersService(BaseService):
 
     def update_user_password(self, token, passwords: dict):
         """ Обновляет пароль пользователя."""
+
         # Получаем данные пользователя из токена с помощью декодировки.
         data = get_decoded_token(token)
         # Получаем данные пользователя по полученному email из декодировки токена.
         user = UserDAO(self._db_session).get_by_email(email=data.get('email'))
-        # Если ошибка, то возвращаем ошибку
-        if passwords.get("old_password") != user["password"]:
+        # Проверяем старые пароли, и если не совпадают, то выводим ошибку.
+        # Здесь используются НЕ хешированные пароли, так как иначе у меня не получилось
+        # (тот старый пароль, кот. передается в словаре запроса хешируется по другому... смотрела через дебадинг).
+        if passwords.get("old_password") != data["password"]:
             return {"error": "Пароли не совпадают"}
-        # Меняем в объекте пароль
+        # Меняем в объекте пользователя пароль на новый и хешированный.
         user.password = get_hashed_password(passwords.get("new_password"))
         # Обновляем пароль пользователя на новый.
-        user = UserDAO(self._db_session).password_update(user)
+        user_with_new_pass = UserDAO(self._db_session).password_update(user)
 
-        return UserSchema().dump(user)
+        return UserSchema().dump(user_with_new_pass)

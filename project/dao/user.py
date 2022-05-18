@@ -45,3 +45,5 @@ class UserDAO:
 
         self._db_session.add(user)
         self._db_session.commit()
+
+        return user

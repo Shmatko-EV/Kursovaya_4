@@ -23,6 +23,7 @@ cors = CORS()
 
 def create_app(config_obj):
     """ Создает приложение: данные таблиц БД и регистрация эндпоинтов. """
+
     app = Flask(__name__)
     app.config.from_object(config_obj)
 
