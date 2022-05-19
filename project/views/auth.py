@@ -3,7 +3,7 @@ from flask_restx import Namespace, Resource, abort
 
 from implemented import auth_service
 from project.schemas.user import UserSchema
-from project.utils import get_hashed_password
+from project.utils import get_hashed_password, auth_required
 
 auth_ns = Namespace('auth')
 
@@ -51,6 +51,7 @@ class LoginView(Resource):
         except TypeError as e:
             return f'Ошибка загрузки данных {e}', 500
 
+    @auth_required
     def put(self):
         """ Генерирует и возвращает словарь с новыми токенами."""
 

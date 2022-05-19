@@ -3,13 +3,14 @@ from flask_restx import Resource, Namespace
 
 from implemented import movie_service
 from project.schemas.movie import MovieSchema
+from project.utils import auth_required
 
 movie_ns = Namespace('movies')
 
 
 @movie_ns.route('/')
 class MoviesView(Resource):
-    #@auth_required
+    @auth_required
     def get(self):
         """ Возвращает данные о всех фильмах. """
 
@@ -36,7 +37,7 @@ class MoviesView(Resource):
         res = MovieSchema(many=True).dump(all_movies)
         return res, 200
 
-    #@admin_required
+    @auth_required
     def post(self):
         """ Создает новые данные нового фильма."""
 
@@ -49,7 +50,7 @@ class MoviesView(Resource):
 
 @movie_ns.route('/<int:m_id>')
 class MovieView(Resource):
-    #@auth_required
+    @auth_required
     def get(self, m_id):
         """ Возвращает данные об одном фильме. """
 
@@ -57,7 +58,7 @@ class MovieView(Resource):
         sm_d = MovieSchema().dump(movie)
         return sm_d, 200
 
-    #@admin_required
+    @auth_required
     def put(self, m_id):
         """ Обновляет данные фильма."""
 
@@ -70,7 +71,7 @@ class MovieView(Resource):
         movie_service.update(req_json)
         return "", 204
 
-    #@admin_required
+    @auth_required
     def delete(self, m_id):
         """ Удаляет данные фильма."""
 
